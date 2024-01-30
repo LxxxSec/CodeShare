@@ -11,7 +11,6 @@ import java.lang.reflect.Field;
 import java.util.PriorityQueue;
 
 public class CB {
-    public static String filePath = "./ser.bin";
     public static void main(String[] args) throws Exception{
         byte[][] codes = {getTemplates()};
         //CC3
@@ -31,16 +30,19 @@ public class CB {
         //将BeanComparator的property改为outputProperties
         setFieldValue(beanComparator, "property", "outputProperties");
         //序列化
-        ser(priorityQueue);
-        //反序列化
-        unser();
+        byte[] bytes = ser(priorityQueue);
+        // 反序列化
+        unser(bytes);
     }
-    public static void ser(Object obj) throws IOException {
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(filePath));
+    public static byte[] ser(Object obj) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(baos);
         objectOutputStream.writeObject(obj);
+        return baos.toByteArray();
     }
-    public static Object unser() throws IOException, ClassNotFoundException {
-        ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(filePath));
+    public static Object unser(byte[] bytes) throws IOException, ClassNotFoundException {
+        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        ObjectInputStream objectInputStream = new ObjectInputStream(bais);
         return objectInputStream.readObject();
     }
     public static void setFieldValue(Object obj, String field, Object val) throws Exception{
